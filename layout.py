@@ -3,7 +3,6 @@ import pandas as pd
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from tkinter import ttk
-from selectionBlock import SelectionBlock
 
 class MyApp:
     def __init__(self, root):
@@ -71,22 +70,23 @@ class MyApp:
 
     def add_selection_block(self):
         # Создание блока с виджетами
-        self.selected_value_block = ttk.Frame(self.combobox_frame)
-        self.selected_value_block.pack(padx=10, pady=10)
+        selected_value_block = ttk.Frame(self.combobox_frame)
+        selected_value_block.pack(padx=10, pady=10)
 
         name = self.combobox.get()
         # Создание виджетов в блоке
-        self.selected_value_label = ttk.Label(self.selected_value_block, text=f"{name}")
-        self.selected_value_label.pack()
-        
-        self.selected_value_entry = ttk.Entry(self.selected_value_block)
-        self.selected_value_entry.pack(pady=10)
-        
-        self.save_button = ttk.Button(self.selected_value_block, text="Удалить", command=lambda: self.delete_selection_block())
-        self.save_button.pack()
+        selected_value_label = ttk.Label(selected_value_block, text=f"{name}")
+        selected_value_label.pack()
 
-    def delete_selection_block(self, block):
-        print("Hello")
+        selected_value_entry = ttk.Entry(selected_value_block)
+        selected_value_entry.pack(pady=10)
+
+        def delete_selection_block():
+            selected_value_block.destroy()
+
+        save_button = ttk.Button(selected_value_block, text="Удалить", command=delete_selection_block)
+        save_button.pack()
+
 
     def show_selected_value(self, event):
         selected_value = self.combobox.get()
