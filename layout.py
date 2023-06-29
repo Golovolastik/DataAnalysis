@@ -1,8 +1,10 @@
 import tkinter as tk
 import pandas as pd
 from matplotlib.figure import Figure
+from matplotlib.patches import Circle
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from tkinter import ttk
+from matplotlib_venn import *
 
 class MyApp:
     def __init__(self, root):
@@ -44,13 +46,7 @@ class MyApp:
         # Установка значений комбобокса как названия колонок
         self.combobox['values'] = column_names
         
-        # Создание графика
-        fig = Figure(figsize=(5, 4), dpi=100)
-        ax = fig.add_subplot(111)
-        ax.plot([1, 2, 3, 4, 5], [2, 4, 6, 8, 10])
-        canvas = FigureCanvasTkAgg(fig, master=self.plot_frame)
-        canvas.draw()
-        canvas.get_tk_widget().pack()
+        self.draw_diagram()
 
         # Создание заголовков столбцов для таблицы
         columns = ["Автор", "Название", "Год"]
@@ -67,6 +63,41 @@ class MyApp:
             table.insert("", "end", values=row)
         
         table.pack(padx=10, pady=10)
+
+    def draw_diagram(self):
+        # Создание графика
+        fig = Figure(figsize=(5, 4), dpi=100)
+        ax = fig.add_subplot(111)
+
+        # Ваш код для создания диаграммы Венна
+        venn_data = (set([1, 2, 3, 4]), set([3, 4, 5, 6]), set([5, 6, 7, 8]))
+        venn3(subsets=venn_data, set_labels=('Set A', 'Set B', 'Set C'), ax=ax)
+        ax.set_title("Venn Diagram")
+
+        # Определение радиуса кругов
+        radius = 0.4
+
+        # Размещение значений внутри кругов
+        for subset, circle in zip(venn_data, ax.collections):
+            center_x, center_y = circle.center
+            circle_radius = circle.radius
+
+            # Создание объекта Circle для текущего круга
+            circle_patch = Circle((center_x, center_y), circle_radius - radius, color='white')
+
+            # Расчет позиции для размещения текста внутри круга
+            text_x, text_y = circle_patch.get_path().interiors[0].coords.mean(axis=0)
+
+            # Отображение значения внутри круга
+            ax.text(text_x, text_y, ', '.join(map(str, subset)), ha='center', va='center')
+
+            # Добавление объекта Circle на график
+            ax.add_patch(circle_patch)
+
+        canvas = FigureCanvasTkAgg(fig, master=self.plot_frame)
+        canvas.draw()
+        canvas.get_tk_widget().pack()
+        
 
     def add_selection_block(self):
         # Создание блока с виджетами
