@@ -5,7 +5,9 @@ from matplotlib.figure import Figure
 from matplotlib.patches import Circle
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from tkinter import ttk
-from matplotlib_venn import *
+from venn_lib import *
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+
 
 class MyApp:
     def __init__(self, root):
@@ -63,25 +65,24 @@ class MyApp:
         # Создание второй вертикальной части (график)
         self.plot_frame = ttk.Frame(self.root, width=400, height=400)
         self.plot_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        #self.plot_frame.pack_propagate(False)
         self.draw_diagram()
         
         # Создание третьей вертикальной части (таблица)
         self.table_frame = ttk.Frame(self.root, width=200, height=200)
         self.table_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         
-        # Создание заголовков столбцов для таблицы
-        columns = ["Автор", "Название", "Год"]
+        # # Создание заголовков столбцов для таблицы
         columns = df.columns.to_list()
-        #print(columns)
         
         # Создание таблицы
         table = ttk.Treeview(self.table_frame, columns=columns, show="headings")
         
-        # Установка заголовков столбцов
+        # # Установка заголовков столбцов
         for column in columns:
             table.heading(column, text=column)
         
-        # Чтение данных из CSV-файла и добавление их в таблицу
+        # # Чтение данных из CSV-файла и добавление их в таблицу
         for row in df[columns].itertuples(index=False):
             table.insert("", "end", values=row)
         
@@ -91,35 +92,25 @@ class MyApp:
         # Создание графика
         fig = Figure(figsize=(5, 4), dpi=100)
         ax = fig.add_subplot(111)
+        ax.set_aspect('equal')
 
         # Ваш код для создания диаграммы Венна
-        venn_data = (set([1, 2, 3, 4]), set([3, 4, 5, 6]), set([5, 6, 7, 8]))
-        venn3(subsets=venn_data, set_labels=('Set A', 'Set B', 'Set C'), ax=ax)
-        ax.set_title("Venn Diagram")
-
-        # Определение радиуса кругов
-        radius = 0.4
-
-        # Размещение значений внутри кругов
-        for subset, circle in zip(venn_data, ax.collections):
-            center_x, center_y = circle.center
-            circle_radius = circle.radius
-
-            # Создание объекта Circle для текущего круга
-            circle_patch = Circle((center_x, center_y), circle_radius - radius, color='white')
-
-            # Расчет позиции для размещения текста внутри круга
-            text_x, text_y = circle_patch.get_path().interiors[0].coords.mean(axis=0)
-
-            # Отображение значения внутри круга
-            ax.text(text_x, text_y, ', '.join(map(str, subset)), ha='center', va='center')
-
-            # Добавление объекта Circle на график
-            ax.add_patch(circle_patch)
+        venn_data = (set([1, 2, 3, 4]), set([3, 4, 5, 6]))
+        venn2(ax, venn_data)
+        #ax.set_title("Venn Diagram")
+        # Устанавливаем пределы осей
+        ax.set_xlim(0, 2)
+        ax.set_ylim(0, 2)
+        ax.axis('off')
 
         canvas = FigureCanvasTkAgg(fig, master=self.plot_frame)
         canvas.draw()
+        # Создание панели инструментов навигации для приближения и перемещения
+        toolbar = NavigationToolbar2Tk(canvas, self.plot_frame)
+        toolbar.update()
         canvas.get_tk_widget().pack()
+        fig.tight_layout()
+        
         
 
     def add_selection_block(self):
