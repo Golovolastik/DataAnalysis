@@ -30,13 +30,13 @@ class MyApp:
         self.combobox = ttk.Combobox(self.container_frame, width=12)
         self.combobox.state(['readonly'])
         self.combobox.grid(padx=5, pady=5, row=1, column=0)
-        self.parametr_dict = {} # Cписок параметров
+        self.parameter_dict = {} # Cписок параметров
         self.add_button = ttk.Button(self.container_frame, text="Добавить", command=self.add_selection_block, width=10)
         self.add_button.grid(padx=5, pady=5, row=2)
 
         # Cоздание области для выбранных параметров
-        self.parametr_frame = ttk.Frame(self.combobox_frame)
-        self.parametr_frame.pack(padx=5, pady=5, side='top')
+        self.parameter_frame = ttk.Frame(self.combobox_frame)
+        self.parameter_frame.pack(padx=5, pady=5, side='top')
 
         # Чтение данных из CSV-файла
         def choose_file():
@@ -50,9 +50,9 @@ class MyApp:
             # Установка значений комбобокса как названия колонок
             self.combobox['values'] = self.column_names
             # Очистка старого фрейма
-            for widget in self.parametr_frame.winfo_children():
+            for widget in self.parameter_frame.winfo_children():
                 widget.destroy()
-            self.parametr_dict.clear()
+            self.parameter_dict.clear()
             self.combobox.set('')
             return df
         
@@ -115,17 +115,17 @@ class MyApp:
         if self.combobox.get() == '':
             return
         # Создание блока с виджетами
-        if not self.parametr_dict:
-            self.accept_button = ttk.Button(self.parametr_frame, text="Применить", command=self.accept_button_command)
+        if not self.parameter_dict:
+            self.accept_button = ttk.Button(self.parameter_frame, text="Применить", command=self.accept_button_command)
             self.accept_button.pack(padx=5, pady=10, side=tk.TOP)
         name = self.combobox.get()
         self.combobox.set('')
-        if name in self.parametr_dict:
+        if name in self.parameter_dict:
             return
         else:
-            self.parametr_dict[name] = None
+            self.parameter_dict[name] = None
         # Создание виджетов в блоке
-        selected_value_label = tk.LabelFrame(self.parametr_frame, text=f"{name}")
+        selected_value_label = tk.LabelFrame(self.parameter_frame, text=f"{name}")
         selected_value_label.pack()
 
         selected_value_entry = ttk.Entry(selected_value_label, width=10)
@@ -133,8 +133,8 @@ class MyApp:
 
         def delete_selection_block():
             selected_value_label.destroy()
-            self.parametr_dict.pop(name)
-            if not self.parametr_dict:
+            self.parameter_dict.pop(name)
+            if not self.parameter_dict:
                 self.accept_button.destroy()
 
         delete_button = ttk.Button(selected_value_label, text="Удалить", command=delete_selection_block)
@@ -143,7 +143,7 @@ class MyApp:
     def accept_button_command(self):
         print("hello!")
         # value1 = 
-        # self.df[self.df[self.parametr_dict[0]] == ]
+        # self.df[self.df[self.parameter_dict[0]] == ]
 
 
 def init_program():
