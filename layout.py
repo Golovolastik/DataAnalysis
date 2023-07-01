@@ -30,7 +30,7 @@ class MyApp:
         self.combobox = ttk.Combobox(self.container_frame, width=12)
         self.combobox.state(['readonly'])
         self.combobox.grid(padx=5, pady=5, row=1, column=0)
-        self.parametr_list = []
+        self.parametr_dict = {} # Cписок параметров
         self.add_button = ttk.Button(self.container_frame, text="Добавить", command=self.add_selection_block, width=10)
         self.add_button.grid(padx=5, pady=5, row=2)
 
@@ -52,11 +52,11 @@ class MyApp:
             # Очистка старого фрейма
             for widget in self.parametr_frame.winfo_children():
                 widget.destroy()
-            self.parametr_list.clear()
+            self.parametr_dict.clear()
             self.combobox.set('')
             return df
         
-        df = choose_file()
+        self.df = choose_file()
 
         # Создание кнопки выбора файла
         self.open_file_button = ttk.Button(self.container_frame, text='Выбрать файл', command=choose_file)
@@ -73,7 +73,7 @@ class MyApp:
         self.table_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         
         # # Создание заголовков столбцов для таблицы
-        columns = df.columns.to_list()
+        columns = self.df.columns.to_list()
         
         # Создание таблицы
         table = ttk.Treeview(self.table_frame, columns=columns, show="headings")
@@ -83,7 +83,7 @@ class MyApp:
             table.heading(column, text=column)
         
         # # Чтение данных из CSV-файла и добавление их в таблицу
-        for row in df[columns].itertuples(index=False):
+        for row in self.df[columns].itertuples(index=False):
             table.insert("", "end", values=row)
         
         table.pack(padx=10, pady=10)
@@ -110,22 +110,20 @@ class MyApp:
         toolbar.update()
         canvas.get_tk_widget().pack()
         fig.tight_layout()
-        
-        
 
     def add_selection_block(self):
         if self.combobox.get() == '':
             return
         # Создание блока с виджетами
-        if not self.parametr_list:
-            self.accept_button = ttk.Button(self.parametr_frame, text="Применить")
+        if not self.parametr_dict:
+            self.accept_button = ttk.Button(self.parametr_frame, text="Применить", command=self.accept_button_command)
             self.accept_button.pack(padx=5, pady=10, side=tk.TOP)
         name = self.combobox.get()
         self.combobox.set('')
-        if name in self.parametr_list:
+        if name in self.parametr_dict:
             return
         else:
-            self.parametr_list.append(name)
+            self.parametr_dict[name] = None
         # Создание виджетов в блоке
         selected_value_label = tk.LabelFrame(self.parametr_frame, text=f"{name}")
         selected_value_label.pack()
@@ -135,14 +133,19 @@ class MyApp:
 
         def delete_selection_block():
             selected_value_label.destroy()
-            self.parametr_list.remove(name)
-            if not self.parametr_list:
+            self.parametr_dict.pop(name)
+            if not self.parametr_dict:
                 self.accept_button.destroy()
 
         delete_button = ttk.Button(selected_value_label, text="Удалить", command=delete_selection_block)
         delete_button.pack()
 
-        
+    def accept_button_command(self):
+        print("hello!")
+        # value1 = 
+        # self.df[self.df[self.parametr_dict[0]] == ]
+
+
 def init_program():
     # Создание экземпляра приложения
     root = tk.Tk()
