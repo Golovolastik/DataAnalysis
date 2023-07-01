@@ -47,7 +47,6 @@ def size_of_circle(set_list):
     if len(set_list) == 2:
         size_list = [ r4, r4]
         factor = len(set_list[0]) / len(set_list[1])
-        print(factor)
         if factor > 1:
             size_list[0] = r1
             factor = 1 / factor
@@ -57,8 +56,11 @@ def size_of_circle(set_list):
             size_list[0] = choose_size(factor)
         return size_list
          
-def choose_distance(size_list):
-    return size_list[0] + size_list[1]*0.2
+def choose_distance(size_list, intersection=True):
+    if intersection:
+        return size_list[0] + size_list[1]*0.2
+    else:
+        return size_list[0] + size_list[1] + 0.15
 
 def venn2(ax, set_list):
     if len(set_list) != 2:
@@ -71,3 +73,15 @@ def venn2(ax, set_list):
         ax.add_artist(circle0)
         circle1 = plt.Circle((big_x + choose_distance(size_list), big_y), size_list[1], color='yellow', alpha=0.5)
         ax.add_artist(circle1)
+    else:
+        circle0 = plt.Circle((big_x, big_y), size_list[0], color='blue', alpha=0.5)
+        ax.add_artist(circle0)
+        circle1 = plt.Circle((big_x + choose_distance(size_list, intersection=False), big_y), size_list[1], color='yellow', alpha=0.5)
+        ax.add_artist(circle1)
+
+def venn3(ax, set_list):
+    if len(set_list) != 3:
+        return
+    size_list = size_of_circle(set_list)
+    big_x, big_y = 0.7, 0.7
+    
