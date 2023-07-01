@@ -32,35 +32,43 @@ class MyApp:
         self.add_button = ttk.Button(self.container_frame, text="Добавить", command=self.add_selection_block, width=10)
         self.add_button.grid(padx=5, pady=5, row=2)
 
+        # Cоздание области для выбранных параметров
+        self.parametr_frame = ttk.Frame(self.combobox_frame)
+        self.parametr_frame.pack(padx=5, pady=5, side='top')
+
         # Чтение данных из CSV-файла
         def choose_file():
             path = filedialog.askopenfilename()
-            df = pd.read_csv(path, sep=';')
+            try:
+                df = pd.read_csv(path, sep=';')
+            except:
+                return
             # Получение списка названий колонок
             self.column_names = df.columns.tolist()
             # Установка значений комбобокса как названия колонок
             self.combobox['values'] = self.column_names
+            # Очистка старого фрейма
+            for widget in self.parametr_frame.winfo_children():
+                widget.destroy()
+            self.parametr_list.clear()
+            self.combobox.set('')
             return df
         
         df = choose_file()
 
-        # Создание квадратной кнопки
+        # Создание кнопки выбора файла
         self.open_file_button = ttk.Button(self.container_frame, text='Выбрать файл', command=choose_file)
         self.open_file_button.grid(padx=5, pady=5, row=0, column=0)
-
-        self.accept_button = ttk.Button(self.combobox_frame, text="Применить")
-        self.accept_button.pack(padx=5, pady=10, side=tk.BOTTOM)
 
         # Создание второй вертикальной части (график)
         self.plot_frame = ttk.Frame(self.root, width=400, height=400)
         self.plot_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self.draw_diagram()
         
         # Создание третьей вертикальной части (таблица)
         self.table_frame = ttk.Frame(self.root, width=200, height=200)
         self.table_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         
-        self.draw_diagram()
-
         # Создание заголовков столбцов для таблицы
         columns = ["Автор", "Название", "Год"]
         columns = df.columns.to_list()
@@ -118,25 +126,29 @@ class MyApp:
         if self.combobox.get() == '':
             return
         # Создание блока с виджетами
-        selected_value_block = ttk.Frame(self.combobox_frame)
-        selected_value_block.pack(padx=10, pady=10)
+        if not self.parametr_list:
+            self.accept_button = ttk.Button(self.parametr_frame, text="Применить")
+            self.accept_button.pack(padx=5, pady=10, side=tk.TOP)
         name = self.combobox.get()
+        self.combobox.set('')
         if name in self.parametr_list:
             return
         else:
             self.parametr_list.append(name)
         # Создание виджетов в блоке
-        selected_value_label = ttk.Label(selected_value_block, text=f"{name}")
+        selected_value_label = tk.LabelFrame(self.parametr_frame, text=f"{name}")
         selected_value_label.pack()
 
-        selected_value_entry = ttk.Entry(selected_value_block)
-        selected_value_entry.pack(pady=10)
+        selected_value_entry = ttk.Entry(selected_value_label, width=10)
+        selected_value_entry.pack(pady=5, padx=5)
 
         def delete_selection_block():
-            selected_value_block.destroy()
+            selected_value_label.destroy()
             self.parametr_list.remove(name)
+            if not self.parametr_list:
+                self.accept_button.destroy()
 
-        delete_button = ttk.Button(selected_value_block, text="Удалить", command=delete_selection_block)
+        delete_button = ttk.Button(selected_value_label, text="Удалить", command=delete_selection_block)
         delete_button.pack()
 
         
