@@ -95,14 +95,13 @@ class MyApp:
         for key in self.parameter_dict:
             result_set = set()
             value = self.parameter_dict[key]
-            print(f"key: {key} - value: {value}")
             finded = self.df[self.df[key] == value]
-            print(finded)
             result_set.update(finded.index)
-            print(f"Result Set: {result_set}")
+            #print(f"Result Set: {result_set}")
             self.set_list.append(result_set)
-        for s in self.set_list:
-            print(s)
+        # for s in self.set_list:
+        #     print(s)
+        return self.set_list
 
     def draw_diagram(self):
         for widget in self.plot_frame.winfo_children():
@@ -113,7 +112,9 @@ class MyApp:
         ax.set_aspect('equal')
 
         # Ваш код для создания диаграммы Венна
-        venn_data = (set([1, 2, 3, 4]), set([3, 4, 5, 6]))
+        #venn_data = (set([1, 2, 3, 4]), set([3, 4, 5, 6]))
+        venn_data = self.make_set()
+        print(venn_data)
         venn2(ax, venn_data)
         #ax.set_title("Venn Diagram")
         # Устанавливаем пределы осей
