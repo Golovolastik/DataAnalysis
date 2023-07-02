@@ -31,6 +31,7 @@ class MyApp:
         self.combobox.state(['readonly'])
         self.combobox.grid(padx=5, pady=5, row=1, column=0)
         self.parameter_dict = {} # Cписок параметров
+        self.entry_list = [] # Список полей для ввода
         self.add_button = ttk.Button(self.container_frame, text="Добавить", command=self.add_selection_block, width=10)
         self.add_button.grid(padx=5, pady=5, row=2)
 
@@ -130,10 +131,12 @@ class MyApp:
 
         selected_value_entry = ttk.Entry(selected_value_label, width=10)
         selected_value_entry.pack(pady=5, padx=5)
+        self.entry_list.append(selected_value_entry)
 
         def delete_selection_block():
             selected_value_label.destroy()
             self.parameter_dict.pop(name)
+            self.entry_list.remove(selected_value_entry)
             if not self.parameter_dict:
                 self.accept_button.destroy()
 
@@ -141,9 +144,13 @@ class MyApp:
         delete_button.pack()
 
     def accept_button_command(self):
-        print("hello!")
-        # value1 = 
-        # self.df[self.df[self.parameter_dict[0]] == ]
+        for i, item in enumerate(self.parameter_dict.items()):
+            key, value = item
+            self.parameter_dict[key] = self.entry_list[i].get()
+        # Трассировка
+        for key in self.parameter_dict:
+            print(f"{key}: {self.parameter_dict[key]}")
+            
 
 
 def init_program():
