@@ -58,6 +58,7 @@ class MyApp:
             return df
         
         self.df = choose_file()
+        self.df = self.df.astype(str)
 
         # Создание кнопки выбора файла
         self.open_file_button = ttk.Button(self.container_frame, text='Выбрать файл', command=choose_file)
@@ -67,7 +68,7 @@ class MyApp:
         self.plot_frame = ttk.Frame(self.root, width=400, height=400)
         self.plot_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         #self.plot_frame.pack_propagate(False)
-        self.draw_diagram()
+        #self.draw_diagram()
         
         # Создание третьей вертикальной части (таблица)
         self.table_frame = ttk.Frame(self.root, width=200, height=200)
@@ -89,7 +90,23 @@ class MyApp:
         
         table.pack(padx=10, pady=10)
 
+    def make_set(self):
+        self.set_list = []
+        for key in self.parameter_dict:
+            result_set = set()
+            value = self.parameter_dict[key]
+            print(f"key: {key} - value: {value}")
+            finded = self.df[self.df[key] == value]
+            print(finded)
+            result_set.update(finded.index)
+            print(f"Result Set: {result_set}")
+            self.set_list.append(result_set)
+        for s in self.set_list:
+            print(s)
+
     def draw_diagram(self):
+        for widget in self.plot_frame.winfo_children():
+            widget.destroy()
         # Создание графика
         fig = Figure(figsize=(5, 4), dpi=100)
         ax = fig.add_subplot(111)
@@ -148,8 +165,10 @@ class MyApp:
             key, value = item
             self.parameter_dict[key] = self.entry_list[i].get()
         # Трассировка
-        for key in self.parameter_dict:
-            print(f"{key}: {self.parameter_dict[key]}")
+        # for key in self.parameter_dict:
+        #     print(f"{key}: {self.parameter_dict[key]}")
+        self.make_set()
+        self.draw_diagram()
             
 
 
