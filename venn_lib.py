@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from math import sqrt
 
 def find_center(ax):
     x_y_coordinates = []
@@ -67,12 +68,20 @@ def venn2(ax, set_list):
         return
     # Intersection True
     size_list = size_of_circle(set_list)
-    big_x, big_y = 0.7, 0.7
+    big_x, big_y = 0.5, 1
     if set_list[0] & set_list[1]:
         circle0 = plt.Circle((big_x, big_y), size_list[0], color='blue', alpha=0.5)
         ax.add_artist(circle0)
-        circle1 = plt.Circle((big_x + choose_distance(size_list), big_y), size_list[1], color='yellow', alpha=0.5)
+        x_adder = choose_distance(size_list)
+        circle1 = plt.Circle((big_x + x_adder, big_y), size_list[1], color='yellow', alpha=0.5)
         ax.add_artist(circle1)
+        intersection = set_list[0].intersection(set_list[1])
+        #print(intersection)
+        intersection = [str(x) for x in intersection]
+        text = '\n'.join(intersection)
+        d = sqrt((big_x + x_adder - big_x)**2 + (big_y - big_y)**2)
+        x = (size_list[0]**2 - size_list[1]**2 + d**2) / (2 * d)
+        ax.text(big_x+x, big_y, text)
     else:
         circle0 = plt.Circle((big_x, big_y), size_list[0], color='blue', alpha=0.5)
         ax.add_artist(circle0)
