@@ -14,48 +14,26 @@ def find_center(ax):
     x_y_coordinates.append(y_center)
     return x_y_coordinates    
 
-def choose_size(factor):
-    if factor < 0.25:
-        return 0.15
-    elif factor < 0.5:
-        return 0.25
-    elif factor < 0.75:
-        return 0.35
-    else:
-        return 0.5
-
 def size_of_circle(set_list):
-    """
-    Всего 4 варианта размеров:
-    r1 = 0.5
-    r2 = 0.35
-    r3 = 0.25
-    r4 = 0.15
-    если разница в количестве значений больше 25% то радиус становится меньше на один шаг
-    """
-    r1 = 0.5
-    r2 = 0.35
-    r3 = 0.25
-    r4 = 0.15
-    size_list = []
-    if len(set_list) <= 1:
-        return
-    max_idx = 0
-    for i, set in enumerate(set_list):
-        if set:
-            if len(set) > len(set_list[max_idx]):
-                max_idx = i
-    if len(set_list) == 2:
-        size_list = [ r4, r4]
-        factor = len(set_list[0]) / len(set_list[1])
-        if factor > 1:
-            size_list[0] = r1
-            factor = 1 / factor
-            size_list[1] = choose_size(factor)
+    lengths = [len(s) for s in set_list]
+    max_length = max(lengths)
+    coefficients = []
+
+    for length in lengths:
+        if length == max_length:
+            coefficients.append(0.5)
         else:
-            size_list[1] = r1
-            size_list[0] = choose_size(factor)
-        return size_list
+            factor = length / max_length
+            if factor >= 0.8:
+                coefficients.append(0.5)
+            elif factor >= 0.6:
+                coefficients.append(0.35)
+            elif factor >= 0.4:
+                coefficients.append(0.25)
+            else:
+                coefficients.append(0.15)
+
+    return coefficients
          
 def choose_distance(size_list, intersection=True):
     if intersection:
