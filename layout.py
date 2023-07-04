@@ -114,12 +114,12 @@ class MyApp:
         # Ваш код для создания диаграммы Венна
         #venn_data = (set([1, 2, 3, 4]), set([3, 4, 5, 6]))
         venn_data = self.make_set()
-        print(venn_data)
-        venn2(ax, venn_data)
+        #print(venn_data)
+        choose_venn(len(venn_data), ax, venn_data, self.parameter_dict)
         #ax.set_title("Venn Diagram")
         # Устанавливаем пределы осей
-        ax.set_xlim(0, 2)
-        ax.set_ylim(0, 2)
+        ax.set_xlim(-2, 3)
+        ax.set_ylim(-2, 3)
         ax.axis('off')
 
         canvas = FigureCanvasTkAgg(fig, master=self.plot_frame)
