@@ -72,3 +72,15 @@ CMakeLists.txt.user*
 *.dll
 *.exe
 
+test_border.py
+drawing_test.py
+one_more_test.py
+pandas_test.py
+set_manipulation.py
+test_diagram.py
+testPlot.py
+venn_lib_test.py
+testPlot.py
+testPlot.py
+testPlot.py
+testPlot.py
