@@ -97,38 +97,106 @@ class MyApp:
             value = self.parameter_dict[key]
             finded = self.df[self.df[key] == value]
             result_set.update(finded.index)
-            #print(f"Result Set: {result_set}")
             self.set_list.append(result_set)
-        # for s in self.set_list:
-        #     print(s)
         return self.set_list
+    
+    def on_point_click(self, event):
+        print("working")
+        # if event.artist in point_value_dict:
+        #     point = point_value_dict[event.artist]
+        #     print(f"Нажата точка {point}")
+
+    def place_dots(self):
+        all_artists = self.ax.get_children()
+        circles = []
+        for artist in all_artists:
+            if isinstance(artist, plt.Circle):
+                # Получаем координаты и радиус окружности
+                center = artist.center
+                radius = artist.radius
+                circles.append([center, radius])
+        number_of_dots = {
+                          0.5: 8,
+                          0.35: 6,
+                          0.25: 4,
+                          0.15: 3
+                         }
+        # Создание нового списка множеств для уникальных значений
+        self.unique_sets = [set() for _ in range(len(self.venn_data))]
+
+        # Заполнение нового списка множеств уникальными значениями
+        for i, current_set in enumerate(self.venn_data):
+            for value in current_set:
+                is_unique = True
+                for j in range(len(self.venn_data)):
+                    if j != i and value in self.venn_data[j]:
+                        is_unique = False
+                        break
+                if is_unique:
+                    self.unique_sets[i].add(value)
+        print(circles)
+        print(self.unique_sets)
+
+        # self.unique_sets = []
+        # for i, current_set in enumerate(self.venn_data):
+        #     unique_values = set()
+        #     for j in range(1, len(self.venn_data)):
+        #         unique_values.update(current_set - self.venn_data[j])
+        #     self.unique_sets.append(unique_values)
+
+        for i, unique in enumerate(self.unique_sets):
+            if len(unique) < number_of_dots.get(circles[i][1]):
+                number = len(unique)
+            else:
+                number = number_of_dots.get(radius)
+            random_set = random.sample(unique, number)
+            for point in random_set:
+                dist = random.random() * circles[i][1]
+                theta = random.random() * 2 * np.pi
+                x = circles[i][0][0] + dist * np.cos(theta) 
+                y = circles[i][0][1] + dist * np.sin(theta)
+                dot = self.ax.plot(x, y, 'ro')[0]
+                dot.set_picker(5)  # Радиус "зоны попадания" для нажатия
+                dot.set_pickradius(5)  # Радиус точки
+        for i, circle in enumerate(circles):
+            for j in range(i+1, len(circles)):
+                if self.venn_data[i].intersection(self.venn_data[j]):
+                    intersection_center = find_circle_intersection_center(circle[0][0], circle[0][1], circle[1], circles[j][0][0], circles[j][0][1], circles[j][1])
+                    points = self.venn_data[i].intersection(self.venn_data[j])
+                    for point in points:
+                        random_offset = -0.1 + random.random() * 0.2
+                        dot = self.ax.plot(intersection_center[0]+random_offset, intersection_center[1]+random_offset, 'go')[0]
+                        dot.set_picker(5)  # Радиус "зоны попадания" для нажатия
+                        dot.set_pickradius(5)  # Радиус точки
+        self.fig.canvas.mpl_connect('pick_event', self.on_point_click)
+
+            
 
     def draw_diagram(self):
         for widget in self.plot_frame.winfo_children():
             widget.destroy()
         # Создание графика
-        fig = Figure(figsize=(5, 4), dpi=100)
-        ax = fig.add_subplot(111)
-        ax.set_aspect('equal')
-
-        # Ваш код для создания диаграммы Венна
-        #venn_data = (set([1, 2, 3, 4]), set([3, 4, 5, 6]))
-        venn_data = self.make_set()
-        #print(venn_data)
-        choose_venn(len(venn_data), ax, venn_data, self.parameter_dict)
-        #ax.set_title("Venn Diagram")
+        self.fig = Figure(figsize=(5, 4), dpi=100)
+        self.ax = self.fig.add_subplot(111)
+        self.ax.set_aspect('equal')
+        self.venn_data = self.make_set()
+        print(self.venn_data)
+        print(self.parameter_dict)
+        choose_venn(len(self.venn_data), self.ax, self.venn_data, self.parameter_dict)
         # Устанавливаем пределы осей
-        ax.set_xlim(-2, 3)
-        ax.set_ylim(-2, 3)
-        ax.axis('off')
+        self.ax.set_xlim(-2, 3)
+        self.ax.set_ylim(-2, 3)
+        self.ax.axis('off')
 
-        canvas = FigureCanvasTkAgg(fig, master=self.plot_frame)
+        self.place_dots()
+
+        canvas = FigureCanvasTkAgg(self.fig, master=self.plot_frame)
         canvas.draw()
         # Создание панели инструментов навигации для приближения и перемещения
         toolbar = NavigationToolbar2Tk(canvas, self.plot_frame)
         toolbar.update()
         canvas.get_tk_widget().pack()
-        fig.tight_layout()
+        self.fig.tight_layout()
 
     def add_selection_block(self):
         if self.combobox.get() == '':
