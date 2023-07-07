@@ -13,6 +13,8 @@ class MyApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Мое приложение")
+        root.geometry('1024x576')
+        root.resizable(False, False)
         
         # Размещение виджетов
         self.create_widgets()
@@ -20,11 +22,11 @@ class MyApp:
     def create_widgets(self):
         # Создание первой вертикальной части (комбобокс и набор виджетов)
         self.combobox_frame = ttk.Frame(self.root, width=200, height=200)
-        self.combobox_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self.combobox_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=False)
 
         # Создание контейнера Frame для кнопки и комбо-бокса
-        self.container_frame = ttk.Frame(self.combobox_frame)
-        self.container_frame.pack(side=tk.TOP, padx=5, pady=5)
+        self.container_frame = ttk.Frame(self.combobox_frame, width=200, height=200)
+        self.container_frame.pack(side=tk.TOP, padx=5, pady=5, expand=False)
 
         # Создание комбобокса
         self.combobox = ttk.Combobox(self.container_frame, width=12)
@@ -37,7 +39,7 @@ class MyApp:
 
         # Cоздание области для выбранных параметров
         self.parameter_frame = ttk.Frame(self.combobox_frame)
-        self.parameter_frame.pack(padx=5, pady=5, side='top')
+        self.parameter_frame.pack(padx=5, pady=5, side='top', expand=False)
 
         # Чтение данных из CSV-файла
         def choose_file():
@@ -72,7 +74,7 @@ class MyApp:
         
         # Создание третьей вертикальной части (таблица)
         self.table_frame = ttk.Frame(self.root, width=200, height=200)
-        self.table_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self.table_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=False)
         
         # # Создание заголовков столбцов для таблицы
         columns = self.df.columns.to_list()
@@ -151,23 +153,38 @@ class MyApp:
                 number = number_of_dots.get(radius)
             random_set = random.sample(unique, number)
             for point in random_set:
-                dist = random.random() * circles[i][1]
+                dist = random.random() * circles[i][1]*0.75
                 theta = random.random() * 2 * np.pi
                 x = circles[i][0][0] + dist * np.cos(theta) 
                 y = circles[i][0][1] + dist * np.sin(theta)
                 dot = self.ax.plot(x, y, 'ro')[0]
                 dot.set_picker(5)  # Радиус "зоны попадания" для нажатия
                 dot.set_pickradius(5)  # Радиус точки
-        for i, circle in enumerate(circles):
-            for j in range(i+1, len(circles)):
-                if self.venn_data[i].intersection(self.venn_data[j]):
-                    intersection_center = find_circle_intersection_center(circle[0][0], circle[0][1], circle[1], circles[j][0][0], circles[j][0][1], circles[j][1])
-                    points = self.venn_data[i].intersection(self.venn_data[j])
-                    for point in points:
-                        random_offset = -0.1 + random.random() * 0.2
-                        dot = self.ax.plot(intersection_center[0]+random_offset, intersection_center[1]+random_offset, 'go')[0]
-                        dot.set_picker(5)  # Радиус "зоны попадания" для нажатия
-                        dot.set_pickradius(5)  # Радиус точки
+        
+        # intersections = []  # Множество для хранения уникальных точек пересечения
+
+        # points = set()
+        # for i, circle in enumerate(circles):
+        #     for j in range(i + 1, len(circles)):
+        #         if self.venn_data[i].intersection(self.venn_data[j]) in points:
+        #             continue
+        #         if self.venn_data[i].intersection(self.venn_data[j]):
+        #             intersection_center = find_circle_intersection_center(
+        #                 circles[i][0][0], circles[i][0][1], circles[i][1],
+        #                 circles[j][0][0], circles[j][0][1], circles[j][1]
+        #             )
+        #             points.update(self.venn_data[i].intersection(self.venn_data[j]))
+        #             #intersections.update(points)  # Добавляем точки пересечения в множество intersections
+        #             print(points)
+        # for point in points:
+        #                 random_offset = -0.1 + random.random() * 0.2
+        #                 dot = self.ax.plot(
+        #                     intersection_center[0] + random_offset,
+        #                     intersection_center[1] + random_offset,
+        #                     'go'
+        #                 )[0]
+        #                 dot.set_picker(5)  # Радиус "зоны попадания" для нажатия
+        #                 dot.set_pickradius(5)  # Радиус точки
         self.fig.canvas.mpl_connect('pick_event', self.on_point_click)
 
             
@@ -246,6 +263,7 @@ def init_program():
     root = tk.Tk()
     app = MyApp(root)
     # Запуск главного цикла Tkinter
+    root.update_idletasks()
     root.mainloop()
 
 init_program()
