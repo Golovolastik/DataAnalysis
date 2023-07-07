@@ -61,8 +61,8 @@ def find_circle_intersection_center(x1, y1, r1, x2, y2, r2):
     a = r_diff / 2
     # Вычисляем координаты центра пересечения
     x_intersect = x1 + (d**2 - r2**2 + r1**2)/(2*d)
-    #y_intersect = y1 + a * (y2 - y1)
-    y_intersect = y1
+    y_intersect = y1 + a * (y2 - y1)
+    #y_intersect = y1
     
     return x_intersect, y_intersect
 
@@ -184,6 +184,7 @@ def venn3(ax, set_list, dict=[1,2,3]):
                 #place_dots(ax, set_list[2], 0.35+x_adder, 1+size_list[0]+size_list[2]*0.8, size_list[2])
                 ax.text(0.35+x_adder, 1+size_list[0]+size_list[2]*0.8, temp_dict[2], ha='center')
             else:
+                print("no more intersections")
                 circle2 = plt.Circle((0.35, 1+size_list[0]+size_list[2]+0.15), size_list[2], color='red', alpha=0.5)
                 #place_dots(ax, set_list[2], 0.35, 1+size_list[0]+size_list[2]+0.15, size_list[2])
                 ax.text(0.35, 1+size_list[0]+size_list[2]+0.15, temp_dict[2], ha='center')
@@ -206,6 +207,7 @@ def venn3(ax, set_list, dict=[1,2,3]):
                 #place_dots(ax, set_list[1], 0.75+size_list[0]+size_list[2], 1+size_list[2]+size_list[1]*0.8, size_list[1])
                 ax.text(0.75+size_list[0]+size_list[2], 1+size_list[2]+size_list[1]*0.8, temp_dict[1], ha='center')
             else:
+                print('no more intersections')
                 circle2 = circle2 = plt.Circle((0.5, 1+size_list[0]+size_list[1]+0.15), size_list[1], color='red', alpha=0.5)
                 #place_dots(ax, set_list[1], 0.5, 1+size_list[0]+size_list[1]+0.15, size_list[1])
                 ax.text(0.5, 1+size_list[0]+size_list[1]+0.15, temp_dict[1], ha='center')
